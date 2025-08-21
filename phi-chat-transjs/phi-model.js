@@ -1,14 +1,15 @@
 import { checkCache } from '../lib/utils.js'
 import { addErrorMsg, addStatusMsg, showQueryControls, setResponseText } from './ui.js'
 
-// ***************************************************************
-// DOES NOT WORK YET!
-// transformers.js doesn't support the model & external data yet
-// https://github.com/xenova/transformers.js/issues/963
-// ***************************************************************
+// *************************************************************************************
+// Only works with local copy of the model until this PR is merged:
+// https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-onnx-web/discussions/3
+// *************************************************************************************
 
-// Using v3 of the Transformers library
+// Using a local patched build v3 of the Transformers library with use_external_data_format bug fixed
+// Need until this MR is merged https://github.com/huggingface/transformers.js/pull/1180
 import { env, pipeline, TextStreamer } from '/home/ben/temp/transformers.js/dist/transformers.js'
+//import { env, pipeline, TextStreamer } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.3.3'
 
 const MODEL = 'microsoft/Phi-3-mini-4k-instruct-onnx-web'
 const USE_LOCAL_MODEL = true
@@ -36,7 +37,9 @@ export async function setUp() {
       device: 'webgpu',
       use_external_data_format: true,
       dtype: 'q4f16',
-
+      // session_options: {
+      //   use_external_data_format: true,
+      // },
       progress_callback: (data) => {
         const progFloor = Math.floor(data.progress)
         if (progFloor % 5 === 0 && oldProgress !== progFloor) {
